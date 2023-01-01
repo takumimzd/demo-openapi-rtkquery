@@ -2,22 +2,19 @@ import Head from "next/head";
 import Image from "next/image";
 import { Inter } from "@next/font/google";
 import styles from "../styles/Home.module.css";
-import {
-  useGetBlogsQuery,
-  usePostBlogsByBlogIdMutation,
-} from "../src/store/blog";
+import { useGetPostsQuery, usePostPostsMutation } from "../src/store/post";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const { data, isLoading, isError } = useGetBlogsQuery();
+  const { data, isLoading, isError } = useGetPostsQuery();
   console.log({ data, isLoading, isError });
 
   const [
-    postBlog,
-    { data: createdBlog, isLoading: isPosting, isError: isPostError },
-  ] = usePostBlogsByBlogIdMutation();
-  console.log({ createdBlog, isPosting, isPostError });
+    createPost,
+    { data: createdPost, isLoading: isPosting, isError: isPostError },
+  ] = usePostPostsMutation();
+  console.log({ createdPost, isPosting, isPostError });
 
   return (
     <>
@@ -35,9 +32,9 @@ export default function Home() {
           </p>
           <button
             onClick={() =>
-              postBlog({
-                blogId: 1,
+              createPost({
                 body: {
+                  id: 1,
                   title: "RTK query",
                   body: "hooksまで自動生成はすごい",
                 },
@@ -46,6 +43,7 @@ export default function Home() {
           >
             POST
           </button>
+          <p>title: {createdPost?.title}</p>
           <div>
             <a
               href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
