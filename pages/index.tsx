@@ -2,13 +2,24 @@ import Head from "next/head";
 import Image from "next/image";
 import { Inter } from "@next/font/google";
 import styles from "../styles/Home.module.css";
-import { useGetPostsQuery, usePostPostsMutation } from "../src/store/post";
+import {
+  useGetPostsByPostIdQuery,
+  usePostPostsMutation,
+} from "../src/store/post";
+import { PostList } from "../src/components/PostList";
+import { useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const { data, isLoading, isError } = useGetPostsQuery();
-  console.log({ data, isLoading, isError });
+  const [page, setPage] = useState(0);
+  // const {} = useGetPostsByPostIdQuery({
+  //   postId: 2,
+  // });
+  // const { data, isLoading, isError, refetch } = useGetPostsByPostIdQuery({
+  //   postId: 3,
+  // });
+  // console.log({ data, isLoading, isError });
 
   const [
     createPost,
@@ -43,7 +54,15 @@ export default function Home() {
           >
             POST
           </button>
+          {/* <button onClick={() => refetch()}>ReFetch</button> */}
           <p>title: {createdPost?.title}</p>
+          <button onClick={() => setPage((pre) => pre + 1)}>
+            currentPage:{page} page +
+          </button>
+          <button onClick={() => setPage((pre) => pre - 1)}>
+            currentPage:{page} page -
+          </button>
+          <PostList page={page} />
           <div>
             <a
               href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"

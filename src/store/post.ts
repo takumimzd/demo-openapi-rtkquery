@@ -1,76 +1,92 @@
 import { emptySplitApi as api } from "./emptyApi";
-const injectedRtkApi = api.injectEndpoints({
-  endpoints: (build) => ({
-    getPosts: build.query<GetPostsApiResponse, GetPostsApiArg>({
-      query: () => ({ url: `/posts` }),
-    }),
-    postPosts: build.mutation<PostPostsApiResponse, PostPostsApiArg>({
-      query: (queryArg) => ({
-        url: `/posts`,
-        method: "POST",
-        body: queryArg.body,
+export const addTagTypes = ["posts", "post"] as const;
+const injectedRtkApi = api
+  .enhanceEndpoints({
+    addTagTypes,
+  })
+  .injectEndpoints({
+    endpoints: (build) => ({
+      getPosts: build.query<GetPostsApiResponse, GetPostsApiArg>({
+        query: (queryArg) => ({
+          url: `/posts`,
+          params: { _start: queryArg._start, _limit: queryArg._limit },
+        }),
+        providesTags: ["posts"],
+      }),
+      postPosts: build.mutation<PostPostsApiResponse, PostPostsApiArg>({
+        query: (queryArg) => ({
+          url: `/posts`,
+          method: "POST",
+          body: queryArg.body,
+        }),
+        invalidatesTags: ["post", "posts"],
+      }),
+      getPostsByPostId: build.query<
+        GetPostsByPostIdApiResponse,
+        GetPostsByPostIdApiArg
+      >({
+        query: (queryArg) => ({ url: `/posts/${queryArg.postId}` }),
+        providesTags: ["post"],
+      }),
+      patchPostsByPostId: build.mutation<
+        PatchPostsByPostIdApiResponse,
+        PatchPostsByPostIdApiArg
+      >({
+        query: (queryArg) => ({
+          url: `/posts/${queryArg.postId}`,
+          method: "PATCH",
+          body: queryArg.body,
+        }),
+        invalidatesTags: ["post"],
       }),
     }),
-    getPostsByPostId: build.query<
-      GetPostsByPostIdApiResponse,
-      GetPostsByPostIdApiArg
-    >({
-      query: (queryArg) => ({ url: `/posts/${queryArg.postId}` }),
-    }),
-    patchPostsByPostId: build.mutation<
-      PatchPostsByPostIdApiResponse,
-      PatchPostsByPostIdApiArg
-    >({
-      query: (queryArg) => ({
-        url: `/posts/${queryArg.postId}`,
-        method: "PATCH",
-        body: queryArg.body,
-      }),
-    }),
-  }),
-  overrideExisting: false,
-});
+    overrideExisting: false,
+  });
 export { injectedRtkApi as api };
 export type GetPostsApiResponse = /** status 200 OK */ {
-  id?: number;
-  userId?: number;
-  title?: string;
-  body?: string;
+  id: number;
+  userId: number;
+  title: string;
+  body: string;
 }[];
-export type GetPostsApiArg = void;
+export type GetPostsApiArg = {
+  /** pagination-number */
+  _start?: number;
+  _limit?: number;
+};
 export type PostPostsApiResponse = /** status 201 Created */ {
-  id?: number;
-  userId?: number;
-  title?: string;
-  body?: string;
+  id: number;
+  userId: number;
+  title: string;
+  body: string;
 };
 export type PostPostsApiArg = {
   body: {
-    id?: number;
-    title?: string;
-    body?: string;
+    id: number;
+    title: string;
+    body: string;
   };
 };
 export type GetPostsByPostIdApiResponse = /** status 200 OK */ {
-  id?: number;
-  userId?: number;
-  title?: string;
-  body?: string;
+  id: number;
+  userId: number;
+  title: string;
+  body: string;
 };
 export type GetPostsByPostIdApiArg = {
   postId: number;
 };
 export type PatchPostsByPostIdApiResponse = /** status 200 OK */ {
-  id?: number;
-  userId?: number;
-  title?: string;
-  body?: string;
+  id: number;
+  userId: number;
+  title: string;
+  body: string;
 };
 export type PatchPostsByPostIdApiArg = {
   postId: number;
   body: {
-    title?: string;
-    body?: string;
+    title: string;
+    body: string;
   };
 };
 export const {
